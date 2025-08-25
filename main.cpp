@@ -90,7 +90,7 @@ int main(int argc, const char** argv)
 	int uOffsetLoc = glGetUniformLocation(shader, "offset");
 	int uRootsLoc  = glGetUniformLocation(shader, "roots");
 	
-	if(uScaleLoc == -1 || uOffsetLoc == -1)
+	if(uScaleLoc == -1 || uOffsetLoc == -1 || uRootsLoc == -1)
 	{
 		std::cerr << "Failed to get uniform location from shader\n";
 		glfwTerminate();
