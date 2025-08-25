@@ -34,5 +34,5 @@ vec2 eval_deriv(vec2 z)
 
 void main()
 {
-	FragColor = vec4(fract(wPos), 0.0, 1.0);
+	FragColor = vec4(fract(eval_func(wPos)), 0.0, 1.0);
 }
