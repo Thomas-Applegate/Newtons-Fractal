@@ -88,6 +88,7 @@ int main(int argc, const char** argv)
 	unsigned int shader = create_shader();
 	int uScaleLoc  = glGetUniformLocation(shader, "scale");
 	int uOffsetLoc = glGetUniformLocation(shader, "offset");
+	int uRootsLoc  = glGetUniformLocation(shader, "roots");
 	
 	if(uScaleLoc == -1 || uOffsetLoc == -1)
 	{
@@ -105,6 +106,7 @@ int main(int argc, const char** argv)
 		
 		glUniform2f(uScaleLoc, scale[0], scale[1]);
 		glUniform2f(uOffsetLoc, offset[0], offset[1]);
+		glUniform2fv(uRootsLoc, 3, roots);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		
 		glfwSwapBuffers(window);
