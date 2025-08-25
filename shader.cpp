@@ -1,4 +1,5 @@
 #include <string>
+#include <vector>
 #include <fstream>
 #include <iostream>
 #include "glad.h"
@@ -28,6 +29,15 @@ unsigned int create_shader()
 	if(!success)
 	{
 		std::cerr << "Could not compile shader\n";
+		
+		GLint maxLength = 0;
+		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
+		
+		// The maxLength includes the NULL character
+		std::vector<GLchar> errorLog(maxLength);
+		glGetShaderInfoLog(shader, maxLength, &maxLength, &errorLog[0]);
+		std::cerr << errorLog.data() << '\n';
+		
 		glfwTerminate();
 		std::exit(1);
 	}
