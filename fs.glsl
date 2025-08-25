@@ -4,6 +4,7 @@ in vec2 wPos;
 out vec4 FragColor;
 
 uniform vec2 roots[3];
+uniform uint iterations;
 
 const vec4 COLORS[3]  = vec4[3](
 					vec4(0.901961, 0.901961, 0.45098, 1.0),
@@ -45,7 +46,7 @@ uint MinIndex(float x, float y, float z)
 void main()
 {
 	vec2 z = wPos;
-	for(int i = 0; i < 50; i++)
+	for(int i = 0; i < iterations; i++)
 	{
 		z = z - cdiv(eval_func(z),eval_deriv(z));
 	}

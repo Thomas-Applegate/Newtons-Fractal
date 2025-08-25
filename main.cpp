@@ -19,12 +19,6 @@ static const float vertices[] = {
 static float scale[] = {(float)WIDTH/(float)HEIGHT, 2.0f};
 static float offset[] = { 0.0f, 0.0f };
 
-static float roots[] = {
-	1.0f, 0.0f,
-	-0.5f, 0.86603f,
-	-0.5f, -0.86603f
-};
-
 static void window_resize(GLFWwindow* window, int width, int height)
 {
 	scale[0] = (float)width/(float)height;
@@ -92,12 +86,22 @@ int program_loop(GLFWwindow* window)
 	int uScaleLoc  = glGetUniformLocation(shader, "scale");
 	int uOffsetLoc = glGetUniformLocation(shader, "offset");
 	int uRootsLoc  = glGetUniformLocation(shader, "roots");
+	int uItersLoc  = glGetUniformLocation(shader, "iterations");
 	
-	if(uScaleLoc == -1 || uOffsetLoc == -1 || uRootsLoc == -1)
+	if(uScaleLoc == -1 || uOffsetLoc == -1 || uRootsLoc == -1 || uItersLoc == -1)
 	{
 		std::cerr << "Failed to get uniform location from shader\n";
 		return 1;
 	}
+	
+	//uniform variable local to this function
+	float roots[] = {
+		1.0f, 0.0f,
+		-0.5f, 0.86603f,
+		-0.5f, -0.86603f
+	};
+	
+	unsigned int numIters = 50;
 	
 	while(!glfwWindowShouldClose(window)) //main program lop
 	{
@@ -116,6 +120,7 @@ int program_loop(GLFWwindow* window)
 		glUniform2f(uScaleLoc, scale[0], scale[1]);
 		glUniform2f(uOffsetLoc, offset[0], offset[1]);
 		glUniform2fv(uRootsLoc, 3, roots);
+		glUniform1ui(uItersLoc, numIters);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		
 		//render imgui
@@ -132,6 +137,7 @@ int program_loop(GLFWwindow* window)
 			roots[4] = -0.5f;
 			roots[5] = -0.86603f;
 		}
+		ImGui::InputScalar("iterations", ImGuiDataType_U32, &numIters);
 		ImGui::End();
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
