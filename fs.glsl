@@ -18,7 +18,7 @@ vec2 cmul(vec2 a, vec2 b)
 
 vec2 cdiv(vec2 a, vec2 b)
 {
-	return vec2(a.x*b.x+a.y*b.y, a.y*b.x-a.x*b.y)/(a.y*a.y+b.y*b.y);
+	return vec2(a.x*b.x+a.y*b.y, a.y*b.x-a.x*b.y)/(b.x*b.x+b.y*b.y);
 }
 
 vec2 eval_func(vec2 z)
