@@ -14,7 +14,7 @@ static const float vertices[] = {
 	1.0f, 1.0f
 };
 
-static float scale[] = {(float)WIDTH/(float)HEIGHT, 5.0f};
+static float scale[] = {(float)WIDTH/(float)HEIGHT, 2.0f};
 static float offset[] = { 0.0f, 0.0f };
 
 static float roots[] = {
@@ -84,6 +84,7 @@ int main(int argc, const char** argv)
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0); 
 	
+	//load and create shader
 	unsigned int shader = create_shader();
 	int uScaleLoc  = glGetUniformLocation(shader, "scale");
 	int uOffsetLoc = glGetUniformLocation(shader, "offset");
@@ -97,7 +98,7 @@ int main(int argc, const char** argv)
 	
 	glUseProgram(shader);
 	glBindVertexArray(vao);
-	while(!glfwWindowShouldClose(window))
+	while(!glfwWindowShouldClose(window)) //main program lop
 	{
 		glfwPollEvents();    
 		process_input(window);
