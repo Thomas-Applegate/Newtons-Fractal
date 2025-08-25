@@ -21,26 +21,15 @@ vec2 cdiv(vec2 a, vec2 b)
 	return ret/(a.y*a.y+b.y*b.y);
 }
 
-vec2 csquared(vec2 a)
-{
-	return cmul(a,a);
-}
-
-vec2 ccubed(vec2 a)
-{
-	return cmul(a, csquared(a));
-}
-
 vec2 eval_func(vec2 z)
 {
-	vec2 a = cmul(z-roots[0], z-roots[1]);
-	return cmul(a, z-roots[2]);
+	return cmul(cmul(z-roots[0], z-roots[1]), z-roots[2]);
 }
 
 vec2 eval_deriv(vec2 z)
 {
-	vec2 ret = cmul(roots[0], roots[1]) + cmul(roots[2], roots[0]+roots[1]);
-	return ret + cmul(z, -2*roots[0]-2*roots[1]-2*roots[2]+3*z);
+	return cmul(roots[0], roots[1]) + cmul(roots[2], roots[0]+roots[1])
+		+ cmul(z, -2*roots[0]-2*roots[1]-2*roots[2]+3*z);
 }
 
 void main()
