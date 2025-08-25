@@ -1,7 +1,6 @@
 #include <iostream>
-#include <glad/glad.h> 
+#include "glad.h"
 #include <GLFW/glfw3.h>
-
 #include "shader.h"
 
 #define WIDTH 800
@@ -88,9 +87,9 @@ int main(int argc, const char** argv)
 	unsigned int shader = create_shader();
 	int uScaleLoc  = glGetUniformLocation(shader, "scale");
 	int uOffsetLoc = glGetUniformLocation(shader, "offset");
-	int uRootsLoc  = glGetUniformLocation(shader, "roots");
+	//int uRootsLoc  = glGetUniformLocation(shader, "roots"); unused for now
 	
-	if(uScaleLoc == -1 || uOffsetLoc == -1 || uRootsLoc == -1)
+	if(uScaleLoc == -1 || uOffsetLoc == -1)
 	{
 		std::cerr << "Failed to get uniform location from shader\n";
 		glfwTerminate();
@@ -106,7 +105,7 @@ int main(int argc, const char** argv)
 		
 		glUniform2f(uScaleLoc, scale[0], scale[1]);
 		glUniform2f(uOffsetLoc, offset[0], offset[1]);
-		glUniform2fv(uRootsLoc, 3, roots);
+		//glUniform2fv(uRootsLoc, 3, roots); unused for now
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		
 		glfwSwapBuffers(window);
