@@ -20,9 +20,9 @@ static float scale[] = {(float)WIDTH/(float)HEIGHT, 2.0f};
 static float offset[] = { 0.0f, 0.0f };
 
 static float roots[] = {
-	-1.0f, 0.0f,
-	0.5f, 0.86603f,
-	0.5f, -0.86603f
+	1.0f, 0.0f,
+	-0.5f, 0.86603f,
+	-0.5f, -0.86603f
 };
 
 static void window_resize(GLFWwindow* window, int width, int height)
@@ -125,11 +125,11 @@ int program_loop(GLFWwindow* window)
 		ImGui::SliderFloat2("root 3", roots+4, -8.0, 8.0);
 		if(ImGui::Button("Reset Roots"))
 		{
-			roots[0] = -1.0f;
+			roots[0] = 1.0f;
 			roots[1] = 0.0f;
-			roots[2] = 0.5f;
+			roots[2] = -0.5f;
 			roots[3] = 0.86603f;
-			roots[4] = 0.5f;
+			roots[4] = -0.5f;
 			roots[5] = -0.86603f;
 		}
 		ImGui::End();
