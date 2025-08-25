@@ -1,7 +1,7 @@
 #include <string>
 #include <fstream>
 #include <iostream>
-#include <glad/glad.h> 
+#include "glad.h"
 #include <GLFW/glfw3.h>
 
 static std::string read_file(const char* name)

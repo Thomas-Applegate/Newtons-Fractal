@@ -1,11 +1,13 @@
-workspace "newtwon-fractal"
+workspace "newtons-fractal"
 	configurations {"debug", "release"}
-project "newtwon-fractal"
+project "newtons-fractal"
 	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++20"
-	targetname "newtwon-fractal"
-	files {"**.cpp", "**.h"}
+	targetname "newtons-fractal"
+	files {"*.cpp", "*.h", "imgui/*.cpp", "imgui/*.h", "imgui/backends/imgui_impl_glfw.*",
+		"imgui/backends/imgui_impl_opengl3.*","imgui/misc/cpp/imgui_stdlib.*"}
+	includedirs {"imgui/", "imgui/backends"}
 	objdir "obj/%{cfg.buildcfg}"
 	targetdir "bin/%{cfg.buildcfg}"
 	
