@@ -1,4 +1,6 @@
 #include <iostream>
+#include <thread>
+#include <chrono>
 #include "glad.h"
 #include <GLFW/glfw3.h>
 #include "imgui.h"
@@ -8,6 +10,8 @@
 
 #define WIDTH 800
 #define HEIGHT 600
+
+using namespace std::chrono_literals;
 
 static const float vertices[] = {
 	-1.0f, -1.0f,
@@ -154,6 +158,7 @@ int program_loop(GLFWwindow* window)
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		
 		glfwSwapBuffers(window);
+		std::this_thread::sleep_for(1ms);
 	}
 	return 0;
 }
