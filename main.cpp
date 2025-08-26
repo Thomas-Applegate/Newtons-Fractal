@@ -152,7 +152,7 @@ int program_loop(GLFWwindow* window)
 		}
 		ImGui::InputInt("iterations", &numIters, 1, 10);
 		if(numIters < 0) numIters = 0;
-		if(numIters > 1000) numIters = 1000;
+		if(numIters > 2000) numIters = 2000;
 		ImGui::End();
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

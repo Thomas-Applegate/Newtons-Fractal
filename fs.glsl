@@ -46,9 +46,12 @@ uint MinIndex(float x, float y, float z)
 void main()
 {
 	vec2 z = wPos;
-	for(int i = 0; i < iterations; i++)
+	int i;
+	for(i = 0; i < iterations; i++)
 	{
-		z = z - cdiv(eval_func(z),eval_deriv(z));
+		vec2 fvalue = eval_func(z);
+		z = z - cdiv(fvalue,eval_deriv(z));
+		if(length(fvalue) < 0.0005) break;
 	}
 	uint idx = MinIndex(distance(z, roots[0]), distance(z, roots[1]), distance(z, roots[2]));
 	FragColor = COLORS[idx];
