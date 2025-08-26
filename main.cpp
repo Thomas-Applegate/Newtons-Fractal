@@ -46,6 +46,7 @@ static GLFWwindow* init()
 		return nullptr;
 	}
 	glfwMakeContextCurrent(window);
+	glfwSwapInterval(0);
 	
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
@@ -103,8 +104,15 @@ int program_loop(GLFWwindow* window)
 	
 	int numIters = 50;
 	
+	double previousTime = glfwGetTime();
+
 	while(!glfwWindowShouldClose(window)) //main program lop
 	{
+		double currentTime = glfwGetTime();
+		double deltaTime = currentTime - previousTime;
+		previousTime = currentTime;
+
+
 		glfwPollEvents();    
 		process_input(window);
 		
@@ -125,6 +133,7 @@ int program_loop(GLFWwindow* window)
 		
 		//render imgui
 		ImGui::Begin("Fractal Controls");
+		ImGui::Text("FPS: %f", 1.0f/deltaTime);
 		ImGui::SliderFloat2("root 1", roots, -8.0, 8.0);
 		ImGui::SliderFloat2("root 2", roots+2, -8.0, 8.0);
 		ImGui::SliderFloat2("root 3", roots+4, -8.0, 8.0);
