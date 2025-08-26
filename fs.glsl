@@ -55,5 +55,5 @@ void main()
 	}
 	uint idx = MinIndex(distance(z, roots[0]), distance(z, roots[1]), distance(z, roots[2]));
 	FragColor = COLORS[idx];
-	if(iterations >= 20) FragColor *= mix(1.0, 0.0, float(i)/float(iterations));
+	if(iterations >= 20) FragColor *= mix(1.0, 0.33, float(i)/float(iterations));
 }
