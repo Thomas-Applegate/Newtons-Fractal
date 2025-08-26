@@ -101,7 +101,7 @@ int program_loop(GLFWwindow* window)
 		-0.5f, -0.86603f
 	};
 	
-	unsigned int numIters = 50;
+	int numIters = 50;
 	
 	while(!glfwWindowShouldClose(window)) //main program lop
 	{
@@ -120,7 +120,7 @@ int program_loop(GLFWwindow* window)
 		glUniform2f(uScaleLoc, scale[0], scale[1]);
 		glUniform2f(uOffsetLoc, offset[0], offset[1]);
 		glUniform2fv(uRootsLoc, 3, roots);
-		glUniform1ui(uItersLoc, numIters);
+		glUniform1i(uItersLoc, numIters);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		
 		//render imgui
@@ -137,7 +137,9 @@ int program_loop(GLFWwindow* window)
 			roots[4] = -0.5f;
 			roots[5] = -0.86603f;
 		}
-		ImGui::InputScalar("iterations", ImGuiDataType_U32, &numIters);
+		ImGui::InputInt("iterations", &numIters, 1, 10);
+		if(numIters < 0) numIters = 0;
+		if(numIters > 1000) numIters = 1000;
 		ImGui::End();
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

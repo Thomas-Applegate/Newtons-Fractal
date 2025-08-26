@@ -4,7 +4,7 @@ in vec2 wPos;
 out vec4 FragColor;
 
 uniform vec2 roots[3];
-uniform uint iterations;
+uniform int iterations;
 
 const vec4 COLORS[3]  = vec4[3](
 					vec4(0.901961, 0.901961, 0.45098, 1.0),
