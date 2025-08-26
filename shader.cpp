@@ -1,4 +1,5 @@
 #include <string>
+#include <vector>
 #include <fstream>
 #include <iostream>
 #include "glad.h"
@@ -27,7 +28,16 @@ unsigned int create_shader()
 	glGetShaderiv(vs, GL_COMPILE_STATUS, &success);
 	if(!success)
 	{
-		std::cerr << "Could not compile shader\n";
+		std::cerr << "Could not compile vertex shader\n";
+		
+		GLint maxLength = 0;
+		glGetShaderiv(vs, GL_INFO_LOG_LENGTH, &maxLength);
+		
+		// The maxLength includes the NULL character
+		std::vector<GLchar> errorLog(maxLength);
+		glGetShaderInfoLog(vs, maxLength, &maxLength, &errorLog[0]);
+		std::cerr << errorLog.data() << '\n';
+		
 		glfwTerminate();
 		std::exit(1);
 	}
@@ -40,7 +50,15 @@ unsigned int create_shader()
 	glGetShaderiv(fs, GL_COMPILE_STATUS, &success);
 	if(!success)
 	{
-		std::cerr << "Could not compile shader\n";
+		std::cerr << "Could not compile  fragment shader\n";
+		
+		GLint maxLength = 0;
+		glGetShaderiv(fs, GL_INFO_LOG_LENGTH, &maxLength);
+		
+		// The maxLength includes the NULL character
+		std::vector<GLchar> errorLog(maxLength);
+		glGetShaderInfoLog(fs, maxLength, &maxLength, &errorLog[0]);
+		std::cerr << errorLog.data() << '\n';
 		glfwTerminate();
 		std::exit(1);
 	}
