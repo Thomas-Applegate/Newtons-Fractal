@@ -35,11 +35,11 @@ vec2 eval_deriv(vec2 z)
 uint MinIndex(float x, float y, float z)
 {
    if (x <= y && x <= z) {
-        return 0; // x is the minimum
+        return uint(0); // x is the minimum
     } else if (y <= x && y <= z) {
-        return 1; // y is the minimum
+        return uint(1); // y is the minimum
     } else {
-        return 2; // z is the minimum
+        return uint(2); // z is the minimum
     }
 }
 
