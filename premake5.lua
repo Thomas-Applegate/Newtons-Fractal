@@ -6,8 +6,9 @@ project "newtons-fractal"
 	cppdialect "C++20"
 	targetname "newtons-fractal"
 	files {"*.cpp", "*.h", "imgui/*.cpp", "imgui/*.h", "imgui/backends/imgui_impl_glfw.*",
-		"imgui/backends/imgui_impl_opengl3.*","imgui/misc/cpp/imgui_stdlib.*"}
-	includedirs {"imgui/", "imgui/backends"}
+		"imgui/backends/imgui_impl_opengl3.*","imgui/misc/cpp/imgui_stdlib.*",
+		"glad/glad.h"}
+	includedirs {"imgui/", "imgui/backends", "glad/"}
 	objdir "obj/%{cfg.buildcfg}"
 	targetdir "bin/%{cfg.buildcfg}"
 	
