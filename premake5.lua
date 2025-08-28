@@ -7,7 +7,7 @@ project "newtons-fractal"
 	targetname "newtons-fractal"
 	files {"*.cpp", "*.h", "imgui/*.cpp", "imgui/*.h", "imgui/backends/imgui_impl_glfw.*",
 		"imgui/backends/imgui_impl_opengl3.*","imgui/misc/cpp/imgui_stdlib.*",
-		"glad/glad.h"}
+		"glad/*"}
 	includedirs {"imgui/", "imgui/backends", "glad/"}
 	objdir "obj/%{cfg.buildcfg}"
 	targetdir "bin/%{cfg.buildcfg}"
