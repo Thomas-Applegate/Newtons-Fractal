@@ -20,12 +20,13 @@ static const float vertices[] = {
 	1.0f, 1.0f
 };
 
-static float scale[] = {(float)WIDTH/(float)HEIGHT, 2.0f};
+static float viewport[] = {(float)WIDTH, (float)HEIGHT, 0.5f};
 static float offset[] = { 0.0f, 0.0f };
 
 static void window_resize(GLFWwindow* window, int width, int height)
 {
-	scale[0] = (float)width/(float)height;
+	viewport[0] = float(width);
+	viewport[1] = float(height);
 	glViewport(0, 0, width, height);
 }
 
@@ -88,12 +89,12 @@ int program_loop(GLFWwindow* window)
 	
 	//load and create shader
 	unsigned int shader = create_shader();
-	int uScaleLoc  = glGetUniformLocation(shader, "scale");
+	int uViewportLoc  = glGetUniformLocation(shader, "viewport");
 	int uOffsetLoc = glGetUniformLocation(shader, "offset");
 	int uRootsLoc  = glGetUniformLocation(shader, "roots");
 	int uItersLoc  = glGetUniformLocation(shader, "iterations");
 	
-	if(uScaleLoc == -1 || uOffsetLoc == -1 || uRootsLoc == -1 || uItersLoc == -1)
+	if(uViewportLoc == -1 || uOffsetLoc == -1 || uRootsLoc == -1 || uItersLoc == -1)
 	{
 		std::cerr << "Failed to get uniform location from shader\n";
 		return 1;
@@ -129,7 +130,7 @@ int program_loop(GLFWwindow* window)
 		glClear(GL_COLOR_BUFFER_BIT);
 		glUseProgram(shader);
 		glBindVertexArray(vao);
-		glUniform2f(uScaleLoc, scale[0], scale[1]);
+		glUniform3f(uViewportLoc, viewport[0], viewport[1], viewport[2]);
 		glUniform2f(uOffsetLoc, offset[0], offset[1]);
 		glUniform2fv(uRootsLoc, 3, roots);
 		glUniform1i(uItersLoc, numIters);
@@ -138,9 +139,9 @@ int program_loop(GLFWwindow* window)
 		//render imgui
 		ImGui::Begin("Fractal Controls");
 		ImGui::Text("FPS: %f", 1.0f/deltaTime);
-		ImGui::SliderFloat2("root 1", roots, -8.0, 8.0);
-		ImGui::SliderFloat2("root 2", roots+2, -8.0, 8.0);
-		ImGui::SliderFloat2("root 3", roots+4, -8.0, 8.0);
+		ImGui::SliderFloat2("root 1", roots, -8.0, 8.0, "%.5f");
+		ImGui::SliderFloat2("root 2", roots+2, -8.0, 8.0, "%.5f");
+		ImGui::SliderFloat2("root 3", roots+4, -8.0, 8.0, "%.5f");
 		if(ImGui::Button("Reset Roots"))
 		{
 			roots[0] = 1.0f;
@@ -153,6 +154,8 @@ int program_loop(GLFWwindow* window)
 		ImGui::InputInt("iterations", &numIters, 1, 10);
 		if(numIters < 0) numIters = 0;
 		if(numIters > 2000) numIters = 2000;
+		ImGui::SliderFloat("zoom", viewport+2, 0.03125, 256.0, "%.5f");
+		ImGui::SliderFloat2("view offset", offset, -16.0, 16.0, "%.5f");
 		ImGui::End();
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
