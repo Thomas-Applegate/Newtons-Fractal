@@ -9,7 +9,8 @@ uniform vec2 offset;
 void main()
 {
 	wPos = vPos;
-	//TODO correct aspect ratio scaling
+	float aspect = viewport.x/viewport.y;
+	wPos.x += sign(wPos.x) * (aspect / 2.0);
 	wPos /= viewport.z; //handle zooming
 	wPos += offset; //handle panning
 	gl_Position = vec4(vPos, 0.0, 1.0);
