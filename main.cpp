@@ -20,7 +20,7 @@ static const float vertices[] = {
 	1.0f, 1.0f
 };
 
-static float viewport[] = {(float)WIDTH, (float)HEIGHT, 0.5f};
+static float viewport[] = {(float)WIDTH, (float)HEIGHT, -2.0f};
 static float offset[] = { 0.0f, 0.0f };
 
 static GLFWwindow* init()
@@ -49,6 +49,8 @@ static GLFWwindow* init()
 	
 	glViewport(0, 0, WIDTH, HEIGHT);
 	
+	//setup input callbacks
+	
 	glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height)
 	{
 		viewport[0] = float(width);
@@ -60,6 +62,17 @@ static GLFWwindow* init()
 	{
 		if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 			glfwSetWindowShouldClose(window, true);
+	});
+	
+	glfwSetScrollCallback(window, [](GLFWwindow* window, double xoffset, double yoffset)
+	{
+		if(yoffset > 0) //zoom in
+		{
+			viewport[2] += 1.0;
+		}else //zoom out
+		{
+			viewport[2] -= 1.0;
+		}
 	});
 	
 	// Setup Dear ImGui context
@@ -153,7 +166,7 @@ int program_loop(GLFWwindow* window)
 		ImGui::InputInt("iterations", &numIters, 1, 10);
 		if(numIters < 0) numIters = 0;
 		if(numIters > 2000) numIters = 2000;
-		ImGui::SliderFloat("zoom", viewport+2, 0.03125, 1024.0, "%.5f");
+		ImGui::SliderFloat("zoom", viewport+2, -50.0, 1024.0, "%.5f");
 		ImGui::SliderFloat2("view offset", offset, -16.0, 16.0, "%.5f");
 		ImGui::End();
 		ImGui::Render();
