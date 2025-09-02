@@ -23,19 +23,6 @@ static const float vertices[] = {
 static float viewport[] = {(float)WIDTH, (float)HEIGHT, 0.5f};
 static float offset[] = { 0.0f, 0.0f };
 
-static void window_resize(GLFWwindow* window, int width, int height)
-{
-	viewport[0] = float(width);
-	viewport[1] = float(height);
-	glViewport(0, 0, width, height);
-}
-
-static void process_input(GLFWwindow *window)
-{
-	if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
-}
-
 static GLFWwindow* init()
 {
 	glfwInit();
@@ -62,7 +49,18 @@ static GLFWwindow* init()
 	
 	glViewport(0, 0, WIDTH, HEIGHT);
 	
-	glfwSetFramebufferSizeCallback(window, window_resize);
+	glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height)
+	{
+		viewport[0] = float(width);
+		viewport[1] = float(height);
+		glViewport(0, 0, width, height);
+	});
+	
+	glfwSetKeyCallback(window, [](GLFWwindow *window, int key, int scancode, int action, int mods)
+	{
+		if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+			glfwSetWindowShouldClose(window, true);
+	});
 	
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
@@ -97,6 +95,9 @@ int program_loop(GLFWwindow* window)
 	if(uViewportLoc == -1 || uOffsetLoc == -1 || uRootsLoc == -1 || uItersLoc == -1)
 	{
 		std::cerr << "Failed to get uniform location from shader\n";
+		glDeleteVertexArrays(1, &vao);
+		glDeleteBuffers(1, &vbo);
+		glDeleteProgram(shader);
 		return 1;
 	}
 	
@@ -117,9 +118,7 @@ int program_loop(GLFWwindow* window)
 		double deltaTime = currentTime - previousTime;
 		previousTime = currentTime;
 
-
-		glfwPollEvents();    
-		process_input(window);
+		glfwPollEvents();
 		
 		// Start the Dear ImGui frame
 		ImGui_ImplOpenGL3_NewFrame();
@@ -154,7 +153,7 @@ int program_loop(GLFWwindow* window)
 		ImGui::InputInt("iterations", &numIters, 1, 10);
 		if(numIters < 0) numIters = 0;
 		if(numIters > 2000) numIters = 2000;
-		ImGui::SliderFloat("zoom", viewport+2, 0.03125, 256.0, "%.5f");
+		ImGui::SliderFloat("zoom", viewport+2, 0.03125, 1024.0, "%.5f");
 		ImGui::SliderFloat2("view offset", offset, -16.0, 16.0, "%.5f");
 		ImGui::End();
 		ImGui::Render();
@@ -163,6 +162,10 @@ int program_loop(GLFWwindow* window)
 		glfwSwapBuffers(window);
 		std::this_thread::sleep_for(1ms);
 	}
+	
+	glDeleteVertexArrays(1, &vao);
+	glDeleteBuffers(1, &vbo);
+	glDeleteProgram(shader);
 	return 0;
 }
 
