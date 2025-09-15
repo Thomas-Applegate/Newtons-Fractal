@@ -1,4 +1,4 @@
-#version 400 core
+#version 330 core
 in vec2 wPos;
 
 out vec4 FragColor;

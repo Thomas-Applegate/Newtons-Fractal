@@ -1,6 +1,7 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include <cmath>
 #include "glad.h"
 #include <GLFW/glfw3.h>
 #include "imgui.h"
@@ -22,6 +23,8 @@ static const float vertices[] = {
 
 static float viewport[] = {(float)WIDTH, (float)HEIGHT, -2.0f};
 static float offset[] = { 0.0f, 0.0f };
+
+static double mouse_lastx, mouse_lasty;
 
 static GLFWwindow* init()
 {
@@ -75,6 +78,29 @@ static GLFWwindow* init()
 		}
 	});
 	
+	glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos)
+	{
+		//scale xpos and ypos to ndc
+		xpos /= (double)viewport[0];
+		ypos /= (double)viewport[1];
+		xpos = std::fma(2.0, xpos, -1.0);
+		ypos = std::fma(2.0, ypos, -1.0);
+		//scale xpos by aspect ratio
+		double haspect = (double)viewport[0]/(double)viewport[1]/2.0;
+		if(xpos >= 0) xpos += haspect; else xpos -= haspect;
+		
+		//calculate view panning if left mouse button is held
+		if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+		{
+			double dx = xpos - mouse_lastx;
+			double dy = ypos - mouse_lasty;
+		}
+		
+		//update last mouse position
+		mouse_lastx = xpos;
+		mouse_lasty = ypos;
+	});
+	
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -86,7 +112,7 @@ static GLFWwindow* init()
 	return window;
 }
 
-int program_loop(GLFWwindow* window)
+static int program_loop(GLFWwindow* window)
 {
 	//create main quad
 	unsigned int vao, vbo;
