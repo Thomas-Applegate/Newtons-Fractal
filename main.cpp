@@ -94,6 +94,19 @@ static GLFWwindow* init()
 		{
 			double dx = xpos - mouse_lastx;
 			double dy = ypos - mouse_lasty;
+			//handle zoom
+			if(viewport[2] > 1.0)
+			{
+				dx /= viewport[2];
+				dy /= viewport[2];
+			}else if(viewport[2] < -1.0)
+			{
+				dx *= -1.0*viewport[2];
+				dy *= -1.0*viewport[2];
+			}
+			//update offset
+			offset[0] += (float)dx;
+			offset[1] += (float)dy;
 		}
 		
 		//update last mouse position
@@ -122,7 +135,8 @@ static int program_loop(GLFWwindow* window)
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0); 
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	
 	//load and create shader
 	unsigned int shader = create_shader();
