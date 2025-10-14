@@ -24,8 +24,6 @@ static const float vertices[] = {
 static float viewport[] = {(float)WIDTH, (float)HEIGHT, -2.0f};
 static float offset[] = { 0.0f, 0.0f };
 
-static double mouse_lastx, mouse_lasty;
-
 static GLFWwindow* init()
 {
 	glfwInit();
@@ -80,19 +78,18 @@ static GLFWwindow* init()
 	
 	glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos)
 	{
-		//scale xpos and ypos to ndc
-		xpos /= (double)viewport[0];
+		static double mouse_lastx, mouse_lasty;
+		
+		//scale xpos and ypos to view space
+		xpos /= (double)viewport[1];
 		ypos /= (double)viewport[1];
 		xpos = std::fma(2.0, xpos, -1.0);
 		ypos = std::fma(2.0, ypos, -1.0);
-		//scale xpos by aspect ratio
-		double haspect = (double)viewport[0]/(double)viewport[1]/2.0;
-		if(xpos >= 0) xpos += haspect; else xpos -= haspect;
 		
 		//calculate view panning if left mouse button is held
-		if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)
+		if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && !ImGui::GetIO().WantCaptureMouse)
 		{
-			double dx = xpos - mouse_lastx;
+			double dx = mouse_lastx - xpos;
 			double dy = ypos - mouse_lasty;
 			//handle zoom
 			if(viewport[2] > 1.0)
