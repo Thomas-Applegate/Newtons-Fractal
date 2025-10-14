@@ -1,6 +1,7 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include <cmath>
 #include "glad.h"
 #include <GLFW/glfw3.h>
 #include "imgui.h"
@@ -20,20 +21,8 @@ static const float vertices[] = {
 	1.0f, 1.0f
 };
 
-static float scale[] = {(float)WIDTH/(float)HEIGHT, 2.0f};
+static float viewport[] = {(float)WIDTH, (float)HEIGHT, -2.0f};
 static float offset[] = { 0.0f, 0.0f };
-
-static void window_resize(GLFWwindow* window, int width, int height)
-{
-	scale[0] = (float)width/(float)height;
-	glViewport(0, 0, width, height);
-}
-
-static void process_input(GLFWwindow *window)
-{
-	if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
-}
 
 static GLFWwindow* init()
 {
@@ -61,7 +50,66 @@ static GLFWwindow* init()
 	
 	glViewport(0, 0, WIDTH, HEIGHT);
 	
-	glfwSetFramebufferSizeCallback(window, window_resize);
+	//setup input callbacks
+	
+	glfwSetFramebufferSizeCallback(window, [](GLFWwindow* window, int width, int height)
+	{
+		viewport[0] = float(width);
+		viewport[1] = float(height);
+		glViewport(0, 0, width, height);
+	});
+	
+	glfwSetKeyCallback(window, [](GLFWwindow *window, int key, int scancode, int action, int mods)
+	{
+		if(key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+			glfwSetWindowShouldClose(window, true);
+	});
+	
+	glfwSetScrollCallback(window, [](GLFWwindow* window, double xoffset, double yoffset)
+	{
+		if(yoffset > 0) //zoom in
+		{
+			viewport[2] += 1.0;
+		}else //zoom out
+		{
+			viewport[2] -= 1.0;
+		}
+	});
+	
+	glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos)
+	{
+		static double mouse_lastx, mouse_lasty;
+		
+		//scale xpos and ypos to view space
+		xpos /= (double)viewport[1];
+		ypos /= (double)viewport[1];
+		xpos = std::fma(2.0, xpos, -1.0);
+		ypos = std::fma(2.0, ypos, -1.0);
+		
+		//calculate view panning if left mouse button is held
+		if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && !ImGui::GetIO().WantCaptureMouse)
+		{
+			double dx = mouse_lastx - xpos;
+			double dy = ypos - mouse_lasty;
+			//handle zoom
+			if(viewport[2] > 1.0)
+			{
+				dx /= viewport[2];
+				dy /= viewport[2];
+			}else if(viewport[2] < -1.0)
+			{
+				dx *= -1.0*viewport[2];
+				dy *= -1.0*viewport[2];
+			}
+			//update offset
+			offset[0] += (float)dx;
+			offset[1] += (float)dy;
+		}
+		
+		//update last mouse position
+		mouse_lastx = xpos;
+		mouse_lasty = ypos;
+	});
 	
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();
@@ -74,7 +122,7 @@ static GLFWwindow* init()
 	return window;
 }
 
-int program_loop(GLFWwindow* window)
+static int program_loop(GLFWwindow* window)
 {
 	//create main quad
 	unsigned int vao, vbo;
@@ -84,18 +132,22 @@ int program_loop(GLFWwindow* window)
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0); 
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	
 	//load and create shader
 	unsigned int shader = create_shader();
-	int uScaleLoc  = glGetUniformLocation(shader, "scale");
+	int uViewportLoc  = glGetUniformLocation(shader, "viewport");
 	int uOffsetLoc = glGetUniformLocation(shader, "offset");
 	int uRootsLoc  = glGetUniformLocation(shader, "roots");
 	int uItersLoc  = glGetUniformLocation(shader, "iterations");
 	
-	if(uScaleLoc == -1 || uOffsetLoc == -1 || uRootsLoc == -1 || uItersLoc == -1)
+	if(uViewportLoc == -1 || uOffsetLoc == -1 || uRootsLoc == -1 || uItersLoc == -1)
 	{
 		std::cerr << "Failed to get uniform location from shader\n";
+		glDeleteVertexArrays(1, &vao);
+		glDeleteBuffers(1, &vbo);
+		glDeleteProgram(shader);
 		return 1;
 	}
 	
@@ -116,9 +168,7 @@ int program_loop(GLFWwindow* window)
 		double deltaTime = currentTime - previousTime;
 		previousTime = currentTime;
 
-
-		glfwPollEvents();    
-		process_input(window);
+		glfwPollEvents();
 		
 		// Start the Dear ImGui frame
 		ImGui_ImplOpenGL3_NewFrame();
@@ -129,7 +179,7 @@ int program_loop(GLFWwindow* window)
 		glClear(GL_COLOR_BUFFER_BIT);
 		glUseProgram(shader);
 		glBindVertexArray(vao);
-		glUniform2f(uScaleLoc, scale[0], scale[1]);
+		glUniform3f(uViewportLoc, viewport[0], viewport[1], viewport[2]);
 		glUniform2f(uOffsetLoc, offset[0], offset[1]);
 		glUniform2fv(uRootsLoc, 3, roots);
 		glUniform1i(uItersLoc, numIters);
@@ -138,9 +188,9 @@ int program_loop(GLFWwindow* window)
 		//render imgui
 		ImGui::Begin("Fractal Controls");
 		ImGui::Text("FPS: %f", 1.0f/deltaTime);
-		ImGui::SliderFloat2("root 1", roots, -8.0, 8.0);
-		ImGui::SliderFloat2("root 2", roots+2, -8.0, 8.0);
-		ImGui::SliderFloat2("root 3", roots+4, -8.0, 8.0);
+		ImGui::SliderFloat2("root 1", roots, -8.0, 8.0, "%.5f");
+		ImGui::SliderFloat2("root 2", roots+2, -8.0, 8.0, "%.5f");
+		ImGui::SliderFloat2("root 3", roots+4, -8.0, 8.0, "%.5f");
 		if(ImGui::Button("Reset Roots"))
 		{
 			roots[0] = 1.0f;
@@ -153,6 +203,8 @@ int program_loop(GLFWwindow* window)
 		ImGui::InputInt("iterations", &numIters, 1, 10);
 		if(numIters < 0) numIters = 0;
 		if(numIters > 2000) numIters = 2000;
+		ImGui::SliderFloat("zoom", viewport+2, -50.0, 1024.0, "%.5f");
+		ImGui::SliderFloat2("view offset", offset, -16.0, 16.0, "%.5f");
 		ImGui::End();
 		ImGui::Render();
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -160,6 +212,10 @@ int program_loop(GLFWwindow* window)
 		glfwSwapBuffers(window);
 		std::this_thread::sleep_for(1ms);
 	}
+	
+	glDeleteVertexArrays(1, &vao);
+	glDeleteBuffers(1, &vbo);
+	glDeleteProgram(shader);
 	return 0;
 }
 

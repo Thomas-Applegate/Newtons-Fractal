@@ -62,6 +62,7 @@ unsigned int create_shader()
 		glfwTerminate();
 		std::exit(1);
 	}
+	
 	unsigned int program = glCreateProgram();
 	glAttachShader(program, vs);
 	glAttachShader(program, fs);
@@ -73,7 +74,11 @@ unsigned int create_shader()
 		glfwTerminate();
 		std::exit(1);
 	}
+	
+	glDetachShader(program, vs);
+	glDetachShader(program, fs);
 	glDeleteShader(vs);
 	glDeleteShader(fs);  
+	
 	return program;
 }
