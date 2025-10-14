@@ -141,8 +141,9 @@ static int program_loop(GLFWwindow* window)
 	int uOffsetLoc = glGetUniformLocation(shader, "offset");
 	int uRootsLoc  = glGetUniformLocation(shader, "roots");
 	int uItersLoc  = glGetUniformLocation(shader, "iterations");
+	int uColorsLoc = glGetUniformLocation(shader, "colors");
 	
-	if(uViewportLoc == -1 || uOffsetLoc == -1 || uRootsLoc == -1 || uItersLoc == -1)
+	if(uViewportLoc == -1 || uOffsetLoc == -1 || uRootsLoc == -1 || uItersLoc == -1|| uColorsLoc == -1)
 	{
 		std::cerr << "Failed to get uniform location from shader\n";
 		glDeleteVertexArrays(1, &vao);
@@ -156,6 +157,12 @@ static int program_loop(GLFWwindow* window)
 		1.0f, 0.0f,
 		-0.5f, 0.86603f,
 		-0.5f, -0.86603f
+	};
+	
+	float colors[] = {
+		0.901961, 0.901961, 0.45098,
+		0.45098, 0.901961, 0.901961,
+		0.901961, 0.45098, 0.901961
 	};
 	
 	int numIters = 50;
@@ -183,6 +190,7 @@ static int program_loop(GLFWwindow* window)
 		glUniform2f(uOffsetLoc, offset[0], offset[1]);
 		glUniform2fv(uRootsLoc, 3, roots);
 		glUniform1i(uItersLoc, numIters);
+		glUniform3fv(uColorsLoc, 3, colors);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		
 		//render imgui
@@ -200,6 +208,9 @@ static int program_loop(GLFWwindow* window)
 			roots[4] = -0.5f;
 			roots[5] = -0.86603f;
 		}
+		ImGui::ColorEdit3("root 1 color", colors);
+		ImGui::ColorEdit3("root 2 color", colors+3);
+		ImGui::ColorEdit3("root 3 color", colors+6);
 		ImGui::InputInt("iterations", &numIters, 1, 10);
 		if(numIters < 0) numIters = 0;
 		if(numIters > 2000) numIters = 2000;

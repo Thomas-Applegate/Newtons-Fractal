@@ -6,10 +6,7 @@ out vec4 FragColor;
 uniform vec2 roots[3];
 uniform int iterations;
 
-const vec4 COLORS[3]  = vec4[3](
-					vec4(0.901961, 0.901961, 0.45098, 1.0),
-					vec4(0.45098, 0.901961, 0.901961, 1.0),
-					vec4(0.901961, 0.45098, 0.901961, 1.0));
+uniform vec3 colors[3];
 
 vec2 cmul(vec2 a, vec2 b)
 {
@@ -54,6 +51,6 @@ void main()
 		if(length(fvalue) < 0.0005) break;
 	}
 	uint idx = MinIndex(distance(z, roots[0]), distance(z, roots[1]), distance(z, roots[2]));
-	FragColor = COLORS[idx];
+	FragColor = vec4(colors[idx], 1.0);
 	if(iterations >= 20) FragColor *= mix(1.0, 0.33, float(i)/float(iterations));
 }
